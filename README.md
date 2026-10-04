@@ -17,7 +17,8 @@ browser engine, same one-line-redirect technique as
 - Everything else: Magic Remote pointer and scroll wheel.
 
 The epub reader always opens in the **Black** theme at max font size (200%),
-with the page arrows and title bar invisible (still clickable) to avoid OLED
+with warm grey text (`#c8b896`, ~half the light of white) and the page
+arrows and title bar invisible (still clickable) to avoid OLED
 burn-in.
 
 The D-pad mapping is a small background daemon (`readerfix.py`, started at

@@ -5,7 +5,8 @@
   descending into same-origin iframes (the epub renders inside one).
 - D-pad up opens the book's detail page from the reader (else the start
   page); down cycles reader font size 200, 175, ..., 75, 200.
-- Reader always opens in the "Black" theme at max font size (200%);
+- Reader always opens in the "Black" theme at max font size (200%), with
+  warm grey text instead of white;
   `.arrow` and `#titlebar` made invisible (still clickable) so nothing
   static burns into the OLED.
 
@@ -149,6 +150,24 @@ READER_JS = """
   }
   addStyle();
   document.addEventListener('DOMContentLoaded', addStyle);
+
+  // Warm grey instead of white in the black theme: ~half the light, 10.8:1 contrast.
+  var BLACK_THEME_TEXT = '#c8b896';
+  function applyTextColor(theme) {
+    var themes = window.reader.rendition.themes;
+    if (theme === 'blackTheme') themes.override('color', BLACK_THEME_TEXT, true);
+    else themes.removeOverride('color');
+  }
+  var waitForReader = setInterval(function(){
+    if (!window.reader || !window.reader.rendition || typeof window.selectTheme !== 'function') return;
+    clearInterval(waitForReader);
+    var originalSelectTheme = window.selectTheme;
+    window.selectTheme = function(id) {
+      originalSelectTheme(id);
+      applyTextColor(id);
+    };
+    applyTextColor(localStorage.getItem('calibre.reader.theme'));
+  }, 250);
 })();
 """
 

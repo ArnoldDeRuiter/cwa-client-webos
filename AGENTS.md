@@ -17,7 +17,8 @@ bridge from `index.html`:
   ArrowUp goes to `/book/<id>` from `/read/<id>/...`, else `/`; ArrowDown
   (reader only) cycles `reader.rendition.themes.fontSize` 200..75.
   On `/read/*` pages it also presets `localStorage` `calibre.reader.theme`
-  = `blackTheme` and `calibre.reader.fontSize` = `200` (read by CWA's reader
+  = `blackTheme` (text overridden to warm grey `#c8b896` via
+  `rendition.themes.override`, black theme only) and `calibre.reader.fontSize` = `200` (read by CWA's reader
   at startup) and sets `.arrow` / `#titlebar` to `opacity: 0` (OLED burn-in).
 - `loginfill.py` — fills `form.cwa-login-form` `username`/`password` from
   the `"cwa"` key in `/var/lib/webosbrew/tv-credentials.json`, never submits.
