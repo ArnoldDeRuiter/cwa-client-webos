@@ -11,7 +11,7 @@ around `https://cwa.1701.nl/` (Calibre-Web Automated, hosted on the pikvm,
 see `../pikvm-playbook`). Two background daemons started via the root exec
 bridge from `index.html`:
 
-- `dpadclick.py` — CDP-injected keydown handler: ArrowLeft/ArrowRight
+- `readerfix.py` — CDP-injected keydown handler: ArrowLeft/ArrowRight
   dispatch pointer/mouse/click events at 50px from the left/right edge,
   mid-height, descending into same-origin iframes (epub reader).
 - `loginfill.py` — fills `form.cwa-login-form` `username`/`password` from
@@ -30,11 +30,11 @@ version** — CI derives it from the release tag.
 ## Testing changes live (do this before committing anything TV-facing)
 
 ```sh
-scp index.html dpadclick.py start-dpadclick.sh loginfill.py start-loginfill.sh \
+scp index.html readerfix.py start-readerfix.sh loginfill.py start-loginfill.sh \
   tvtje:/media/developer/apps/usr/palm/applications/nl.arnolderuiter.cwa/
 ```
 
-Relaunch on the TV, check `/tmp/cwa-dpadclick.log` / `/tmp/cwa-loginfill.log` over SSH.
+Relaunch on the TV, check `/tmp/cwa-readerfix.log` / `/tmp/cwa-loginfill.log` over SSH.
 
 ## Direct install (no release)
 

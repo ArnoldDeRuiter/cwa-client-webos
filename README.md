@@ -12,7 +12,7 @@ browser engine, same one-line-redirect technique as
   field is focused.
 - Everything else: Magic Remote pointer and scroll wheel.
 
-The D-pad mapping is a small background daemon (`dpadclick.py`, started at
+The D-pad mapping is a small background daemon (`readerfix.py`, started at
 launch via the Homebrew Channel root exec bridge) that injects a key handler
 into the app's page over the on-device Chrome DevTools Protocol. It exits
 when the app closes.

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Background daemon: D-pad left/right click the page's left/right edge.
+"""Background daemon: TV tweaks for CWA's web reader, injected over CDP.
 
-Turns a remote's D-pad into page-turn taps for CWA's web reader: ArrowLeft
-clicks at (50px, mid-height) and ArrowRight at (width - 50px, mid-height),
-descending into same-origin iframes (the epub reader renders inside one).
-Injected over the on-device Chrome DevTools Protocol, same architecture as
-family7-webos's scrollfix.py, since index.html's own JS context is gone
-after the top-level redirect.
+- D-pad left/right click at 50px from the left/right edge, mid-height,
+  descending into same-origin iframes (the epub renders inside one).
+- Reader always opens in the "Black" theme at max font size (200%);
+  `.arrow` and `#titlebar` made invisible (still clickable) so nothing
+  static burns into the OLED.
+
+Same architecture as family7-webos's scrollfix.py, since index.html's own
+JS context is gone after the top-level redirect.
 """
 
 import base64
@@ -20,9 +22,9 @@ CDP_HOST = "127.0.0.1"
 CDP_PORT = 9998
 APP_DESCRIPTION = "nl.arnolderuiter.cwa"
 POLL_INTERVAL_SECONDS = 3
-PIDFILE = "/tmp/cwa-dpadclick.pid"
+PIDFILE = "/tmp/cwa-readerfix.pid"
 
-FIX_JS = """
+DPAD_JS = """
 (function(){
   if (window.__dpadClickInstalled) return;
   window.__dpadClickInstalled = true;
@@ -97,6 +99,33 @@ FIX_JS = """
   }, 1000);
 })();
 """
+
+READER_JS = """
+(function(){
+  if (window.__readerFixInstalled || location.pathname.indexOf('/read/') !== 0) return;
+  window.__readerFixInstalled = true;
+  // Read by the reader's own startup code; fontSize 200 is the slider max.
+  try {
+    localStorage.setItem('calibre.reader.theme', 'blackTheme');
+    localStorage.setItem('calibre.reader.fontSize', '200');
+  } catch (e) {}
+  var CSS = '.arrow, .arrow:hover, .arrow:active, .arrow.active,'
+    + ' #titlebar, #titlebar:hover { opacity: 0 !important; }';
+  function addStyle() {
+    if (document.getElementById('__readerFixStyle')) return;
+    var parent = document.head || document.documentElement;
+    if (!parent) return;
+    var style = document.createElement('style');
+    style.id = '__readerFixStyle';
+    style.textContent = CSS;
+    parent.appendChild(style);
+  }
+  addStyle();
+  document.addEventListener('DOMContentLoaded', addStyle);
+})();
+"""
+
+FIX_JS = DPAD_JS + READER_JS
 
 
 def _handshake(sock, host, port, path):
@@ -200,7 +229,7 @@ def _watch_target(target):
         _send_frame(
             sock, json.dumps({"id": 3, "method": "Runtime.evaluate", "params": {"expression": FIX_JS}})
         )
-        print("dpadclick: injected into target %s" % target_id, flush=True)
+        print("readerfix: injected into target %s" % target_id, flush=True)
         sock.settimeout(60)
         while True:
             try:
@@ -210,7 +239,7 @@ def _watch_target(target):
             if opcode == 0x8:
                 break
     except OSError as exc:
-        print("dpadclick: target %s connection ended: %s" % (target_id, exc), flush=True)
+        print("readerfix: target %s connection ended: %s" % (target_id, exc), flush=True)
     finally:
         try:
             sock.close()
@@ -219,10 +248,10 @@ def _watch_target(target):
 
 
 def main():
-    print("dpadclick: watching for %s" % APP_DESCRIPTION, flush=True)
+    print("readerfix: watching for %s" % APP_DESCRIPTION, flush=True)
     target = _find_target()
     _watch_target(target)
-    print("dpadclick: CWA closed, exiting", flush=True)
+    print("readerfix: CWA closed, exiting", flush=True)
     try:
         if str(os.getpid()) == open(PIDFILE).read().strip():
             os.remove(PIDFILE)
