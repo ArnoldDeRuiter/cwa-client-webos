@@ -17,6 +17,19 @@ launch via the Homebrew Channel root exec bridge) that injects a key handler
 into the app's page over the on-device Chrome DevTools Protocol. It exits
 when the app closes.
 
+## Login autofill (optional)
+
+Fills CWA's username/password fields on the login page, never submits.
+Reads the `"cwa"` key from root-only `/var/lib/webosbrew/tv-credentials.json`
+on the TV (same file as family7-webos / f1tv-webos):
+
+```json
+{"cwa": {"username": "your-username", "password": "your-password"}}
+```
+
+Skipped when a `remember_token` session cookie already exists; exits after
+filling once.
+
 ## Installing
 
 In Homebrew Channel, open **Add repository** and enter:

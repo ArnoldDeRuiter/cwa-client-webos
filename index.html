@@ -12,10 +12,12 @@
     location.href = DEST;
   }
   var appDir = "/media/developer/apps/usr/palm/applications/nl.arnolderuiter.cwa";
+  var startBackgroundServicesCommand =
+    "sh " + appDir + "/start-dpadclick.sh; sh " + appDir + "/start-loginfill.sh";
   try {
     var bridge = new PalmServiceBridge();
     bridge.onservicecallback = go;
-    bridge.call("luna://org.webosbrew.hbchannel.service/exec", JSON.stringify({command: "sh " + appDir + "/start-dpadclick.sh"}));
+    bridge.call("luna://org.webosbrew.hbchannel.service/exec", JSON.stringify({command: startBackgroundServicesCommand}));
   } catch (e) {
     go();
   }

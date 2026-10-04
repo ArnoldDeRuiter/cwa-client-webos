@@ -13,8 +13,8 @@ trap 'rm -rf "$WORK"' EXIT
 
 DATA_DIR="$WORK/data/$INSTALL_ROOT"
 mkdir -p "$DATA_DIR"
-cp -R appinfo.json index.html icon.png splash.png dpadclick.py start-dpadclick.sh "$DATA_DIR/"
-chmod +x "$DATA_DIR/start-dpadclick.sh"
+cp -R appinfo.json index.html icon.png splash.png dpadclick.py start-dpadclick.sh loginfill.py start-loginfill.sh "$DATA_DIR/"
+chmod +x "$DATA_DIR/start-dpadclick.sh" "$DATA_DIR/start-loginfill.sh"
 
 # packageinfo.json is separate from appinfo.json and lives at a different
 # path entirely -- required by the on-device installer (appinstalld), or

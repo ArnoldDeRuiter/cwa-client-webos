@@ -8,12 +8,15 @@ specific to this repo.
 
 `type: web` Homebrew app (`nl.arnolderuiter.cwa`) — full-screen wrapper
 around `https://cwa.1701.nl/` (Calibre-Web Automated, hosted on the pikvm,
-see `../pikvm-playbook`). One background daemon started via the root exec
+see `../pikvm-playbook`). Two background daemons started via the root exec
 bridge from `index.html`:
 
 - `dpadclick.py` — CDP-injected keydown handler: ArrowLeft/ArrowRight
   dispatch pointer/mouse/click events at 50px from the left/right edge,
   mid-height, descending into same-origin iframes (epub reader).
+- `loginfill.py` — fills `form.cwa-login-form` `username`/`password` from
+  the `"cwa"` key in `/var/lib/webosbrew/tv-credentials.json`, never submits.
+  Skips when the Flask-Login `remember_token` cookie exists.
 
 ## Build
 
@@ -27,11 +30,20 @@ version** — CI derives it from the release tag.
 ## Testing changes live (do this before committing anything TV-facing)
 
 ```sh
-scp index.html dpadclick.py start-dpadclick.sh \
+scp index.html dpadclick.py start-dpadclick.sh loginfill.py start-loginfill.sh \
   tvtje:/media/developer/apps/usr/palm/applications/nl.arnolderuiter.cwa/
 ```
 
-Relaunch on the TV, check `/tmp/cwa-dpadclick.log` over SSH.
+Relaunch on the TV, check `/tmp/cwa-dpadclick.log` / `/tmp/cwa-loginfill.log` over SSH.
+
+## Direct install (no release)
+
+```sh
+./build.sh && scp nl.arnolderuiter.cwa_*_all.ipk tvtje:/tmp/
+ssh -tt tvtje 'luna-send -w 60000 -n 8 luna://com.webos.appInstallService/dev/install "{\"id\":\"com.ares.defaultName\",\"ipkUrl\":\"/tmp/nl.arnolderuiter.cwa_0.1.0_all.ipk\",\"subscribe\":true}"'
+```
+
+`luna-send` prints nothing over SSH without a TTY — always `ssh -tt`.
 
 ## Rules
 
