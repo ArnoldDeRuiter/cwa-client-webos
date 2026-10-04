@@ -7,24 +7,41 @@ browser engine, same one-line-redirect technique as
 
 ## Remote controls
 
-- **D-pad left / right**: clicks the page at 50px from the left / right edge,
-  vertically centered — turns pages in CWA's web reader. Ignored while a text
-  field is focused.
-- **D-pad up**: from the reader, opens the book's detail page; anywhere else,
-  the start page.
-- **D-pad down** (reader only): cycles font size 200 → 175 → 150 → 125 →
-  100 → 75 → 200.
-- Everything else: Magic Remote pointer and scroll wheel.
+| Button | Where | Action |
+|---|---|---|
+| D-pad left / right | everywhere | Click 50px from the left / right edge, vertically centered — turns pages in the reader |
+| D-pad up | reader | Open the book's detail page |
+| D-pad up | elsewhere | Go to the start page (`cwa.1701.nl`) |
+| D-pad down | reader | Cycle font size 200 → 175 → 150 → 125 → 100 → 75 → 200% |
+| Channel up | reader (Black theme) | Text one step brighter |
+| Channel down | reader (Black theme) | Text one step dimmer |
+| Pointer / scroll wheel | everywhere | Normal browser behaviour |
+
+All of the above are ignored while a text field (search, login) is focused.
+
+Text brightness steps, all warm-toned and at least 7:1 contrast on black:
+
+| Step | Colour | Light vs white |
+|---|---|---|
+| 1 (dimmest) | `#a89a7e` | ~33% |
+| 2 | `#b8a88a` | ~40% |
+| 3 (default) | `#c8b896` | ~49% |
+| 4 | `#d8cab0` | ~60% |
+| 5 | `#e8dfcc` | ~74% |
+| 6 (brightest) | `#ffffff` | 100% |
+
+The chosen step is remembered across books and launches.
+
+## Reader defaults (OLED)
 
 The epub reader always opens in the **Black** theme at max font size (200%),
-with warm grey text (`#c8b896`, ~half the light of white) and the page
-arrows and title bar invisible (still clickable) to avoid OLED
-burn-in.
+with warm grey text and the page arrows and title bar invisible (still
+clickable) to avoid OLED burn-in. Switching to another theme in the reader
+settings restores that theme's normal text colour.
 
-The D-pad mapping is a small background daemon (`readerfix.py`, started at
-launch via the Homebrew Channel root exec bridge) that injects a key handler
-into the app's page over the on-device Chrome DevTools Protocol. It exits
-when the app closes.
+All of this is a small background daemon (`readerfix.py`, started at launch
+via the Homebrew Channel root exec bridge) that injects into the app's page
+over the on-device Chrome DevTools Protocol. It exits when the app closes.
 
 ## Login autofill (optional)
 

@@ -16,8 +16,11 @@ bridge from `index.html`:
   mid-height, descending into same-origin iframes (epub reader).
   ArrowUp goes to `/book/<id>` from `/read/<id>/...`, else `/`; ArrowDown
   (reader only) cycles `reader.rendition.themes.fontSize` 200..75.
+  PageUp/PageDown (remote channel up/down, keyCodes 33/34) step the black
+  theme text colour through `TEXT_COLORS`, index kept in `localStorage`
+  `cwa.tv.textColorIndex`.
   On `/read/*` pages it also presets `localStorage` `calibre.reader.theme`
-  = `blackTheme` (text overridden to warm grey `#c8b896` via
+  = `blackTheme` (text overridden to the selected warm grey via
   `rendition.themes.override`, black theme only) and `calibre.reader.fontSize` = `200` (read by CWA's reader
   at startup) and sets `.arrow` / `#titlebar` to `opacity: 0` (OLED burn-in).
 - `loginfill.py` — fills `form.cwa-login-form` `username`/`password` from

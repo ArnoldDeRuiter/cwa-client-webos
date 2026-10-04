@@ -5,8 +5,9 @@
   descending into same-origin iframes (the epub renders inside one).
 - D-pad up opens the book's detail page from the reader (else the start
   page); down cycles reader font size 200, 175, ..., 75, 200.
+- Channel up/down step the reader's text brighter/dimmer (warm grey to white).
 - Reader always opens in the "Black" theme at max font size (200%), with
-  warm grey text instead of white;
+  warm grey text (default) instead of white;
   `.arrow` and `#titlebar` made invisible (still clickable) so nothing
   static burns into the OLED.
 
@@ -94,18 +95,28 @@ DPAD_JS = """
     if (fader) fader.value = next;
   }
 
+  // Channel up/down (PageUp/PageDown): step reader text brighter/dimmer.
+  function stepTextColor(delta) {
+    var w = topWindow();
+    if (typeof w.__readerFixStepTextColor === 'function') w.__readerFixStepTextColor(delta);
+  }
+
   function onKeyDown(e) {
     var right = e.key === 'ArrowRight' || e.keyCode === 39;
     var left = e.key === 'ArrowLeft' || e.keyCode === 37;
     var up = e.key === 'ArrowUp' || e.keyCode === 38;
-    var down = (e.key === 'ArrowDown' || e.keyCode === 40) && !!topWindow().reader;
-    if (!left && !right && !up && !down) return;
+    var inReader = !!topWindow().reader;
+    var down = (e.key === 'ArrowDown' || e.keyCode === 40) && inReader;
+    var brighter = (e.key === 'PageUp' || e.keyCode === 33) && inReader;
+    var dimmer = (e.key === 'PageDown' || e.keyCode === 34) && inReader;
+    if (!left && !right && !up && !down && !brighter && !dimmer) return;
     var a = e.target;
     if (a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return;
     e.preventDefault();
     e.stopImmediatePropagation();
     if (up) goUp();
     else if (down) cycleFontSize();
+    else if (brighter || dimmer) stepTextColor(brighter ? 1 : -1);
     else clickSide(right);
   }
 
@@ -151,13 +162,23 @@ READER_JS = """
   addStyle();
   document.addEventListener('DOMContentLoaded', addStyle);
 
-  // Warm grey instead of white in the black theme: ~half the light, 10.8:1 contrast.
-  var BLACK_THEME_TEXT = '#c8b896';
+  // Warm grey steps instead of white, dim to bright (33..100% light, all >= 7.6:1 contrast).
+  var TEXT_COLORS = ['#a89a7e', '#b8a88a', '#c8b896', '#d8cab0', '#e8dfcc', '#ffffff'];
+  var DEFAULT_TEXT_COLOR_INDEX = 2;
+  function textColorIndex() {
+    var i = parseInt(localStorage.getItem('cwa.tv.textColorIndex'), 10);
+    return i >= 0 && i < TEXT_COLORS.length ? i : DEFAULT_TEXT_COLOR_INDEX;
+  }
   function applyTextColor(theme) {
     var themes = window.reader.rendition.themes;
-    if (theme === 'blackTheme') themes.override('color', BLACK_THEME_TEXT, true);
+    if (theme === 'blackTheme') themes.override('color', TEXT_COLORS[textColorIndex()], true);
     else themes.removeOverride('color');
   }
+  window.__readerFixStepTextColor = function(delta) {
+    var i = Math.max(0, Math.min(TEXT_COLORS.length - 1, textColorIndex() + delta));
+    localStorage.setItem('cwa.tv.textColorIndex', String(i));
+    applyTextColor(localStorage.getItem('calibre.reader.theme'));
+  };
   var waitForReader = setInterval(function(){
     if (!window.reader || !window.reader.rendition || typeof window.selectTheme !== 'function') return;
     clearInterval(waitForReader);
