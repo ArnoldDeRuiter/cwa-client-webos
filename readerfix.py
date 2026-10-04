@@ -3,6 +3,8 @@
 
 - D-pad left/right click at 50px from the left/right edge, mid-height,
   descending into same-origin iframes (the epub renders inside one).
+- D-pad up opens the book's detail page from the reader (else the start
+  page); down cycles reader font size 200, 175, ..., 75, 200.
 - Reader always opens in the "Black" theme at max font size (200%);
   `.arrow` and `#titlebar` made invisible (still clickable) so nothing
   static burns into the OLED.
@@ -70,15 +72,40 @@ DPAD_JS = """
     ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function(type){ fire(t, type); });
   }
 
+  var FONT_SIZES = ['200', '175', '150', '125', '100', '75'];
+
+  // Up: reader goes to the book's detail page, anywhere else to the start page.
+  function goUp() {
+    var w = topWindow();
+    var m = w.location.pathname.match(/^[/]read[/](\\d+)[/]/);
+    w.location.href = m ? '/book/' + m[1] : '/';
+  }
+
+  // Down: step the reader font size down, wrapping 75 back to 200.
+  function cycleFontSize() {
+    var w = topWindow();
+    if (!w.reader || !w.reader.rendition) return;
+    var current = w.localStorage.getItem('calibre.reader.fontSize') || '100';
+    var next = FONT_SIZES[(FONT_SIZES.indexOf(current) + 1) % FONT_SIZES.length];
+    w.reader.rendition.themes.fontSize(next + '%');
+    w.localStorage.setItem('calibre.reader.fontSize', next);
+    var fader = w.document.getElementById('fontSizeFader');
+    if (fader) fader.value = next;
+  }
+
   function onKeyDown(e) {
     var right = e.key === 'ArrowRight' || e.keyCode === 39;
     var left = e.key === 'ArrowLeft' || e.keyCode === 37;
-    if (!left && !right) return;
+    var up = e.key === 'ArrowUp' || e.keyCode === 38;
+    var down = (e.key === 'ArrowDown' || e.keyCode === 40) && !!topWindow().reader;
+    if (!left && !right && !up && !down) return;
     var a = e.target;
     if (a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    clickSide(right);
+    if (up) goUp();
+    else if (down) cycleFontSize();
+    else clickSide(right);
   }
 
   function hook(win) {

@@ -10,6 +10,10 @@ browser engine, same one-line-redirect technique as
 - **D-pad left / right**: clicks the page at 50px from the left / right edge,
   vertically centered — turns pages in CWA's web reader. Ignored while a text
   field is focused.
+- **D-pad up**: from the reader, opens the book's detail page; anywhere else,
+  the start page.
+- **D-pad down** (reader only): cycles font size 200 → 175 → 150 → 125 →
+  100 → 75 → 200.
 - Everything else: Magic Remote pointer and scroll wheel.
 
 The epub reader always opens in the **Black** theme at max font size (200%),

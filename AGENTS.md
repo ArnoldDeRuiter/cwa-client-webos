@@ -14,6 +14,8 @@ bridge from `index.html`:
 - `readerfix.py` — CDP-injected keydown handler: ArrowLeft/ArrowRight
   dispatch pointer/mouse/click events at 50px from the left/right edge,
   mid-height, descending into same-origin iframes (epub reader).
+  ArrowUp goes to `/book/<id>` from `/read/<id>/...`, else `/`; ArrowDown
+  (reader only) cycles `reader.rendition.themes.fontSize` 200..75.
   On `/read/*` pages it also presets `localStorage` `calibre.reader.theme`
   = `blackTheme` and `calibre.reader.fontSize` = `200` (read by CWA's reader
   at startup) and sets `.arrow` / `#titlebar` to `opacity: 0` (OLED burn-in).
