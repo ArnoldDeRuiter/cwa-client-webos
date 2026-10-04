@@ -1,0 +1,13 @@
+{
+    "id": "nl.arnolderuiter.cwa",
+    "version": "0.1.0",
+    "vendor": "ArnoldDeRuiter",
+    "type": "web",
+    "main": "index.html",
+    "title": "CWA Reader",
+    "icon": "icon.png",
+    "largeIcon": "icon.png",
+    "bgColor": "#1f3a5f",
+    "iconColor": "#1f3a5f",
+    "splashBackground": "splash.png"
+}

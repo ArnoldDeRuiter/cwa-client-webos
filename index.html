@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script>
+(function(){
+  var DEST = "https://cwa.1701.nl/";
+  var navigated = false;
+  function go() {
+    if (navigated) return;
+    navigated = true;
+    location.href = DEST;
+  }
+  var appDir = "/media/developer/apps/usr/palm/applications/nl.arnolderuiter.cwa";
+  try {
+    var bridge = new PalmServiceBridge();
+    bridge.onservicecallback = go;
+    bridge.call("luna://org.webosbrew.hbchannel.service/exec", JSON.stringify({command: "sh " + appDir + "/start-dpadclick.sh"}));
+  } catch (e) {
+    go();
+  }
+  setTimeout(go, 2000);
+})();
+</script>
+</head>
+<body></body>
+</html>
