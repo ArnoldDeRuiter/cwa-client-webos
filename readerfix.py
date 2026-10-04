@@ -10,6 +10,8 @@
   warm grey text (default) instead of white;
   `.arrow` and `#titlebar` made invisible (still clickable) so nothing
   static burns into the OLED.
+- Exact reading position saved per book on every page turn and restored on
+  open (CWA's own save only fires on unload and can reset to 0%).
 
 Same architecture as family7-webos's scrollfix.py, since index.html's own
 JS context is gone after the top-level redirect.
@@ -179,9 +181,36 @@ READER_JS = """
     localStorage.setItem('cwa.tv.textColorIndex', String(i));
     applyTextColor(localStorage.getItem('calibre.reader.theme'));
   };
+  // Exact per-book position, saved on every page turn: CWA only saves on unload
+  // (unreliable on app close) plus a rounded percent that can reset to 0.
+  function restorePosition() {
+    var rendition = window.reader.rendition;
+    var key = 'cwa.tv.cfi.' + window.calibre.bookUrl;
+    var saved = localStorage.getItem(key);
+    var restored = !saved;
+    // CWA's epub-progress.js jumps to cfiFromPercentage(savedPercent) once locations load.
+    var locations = window.epub.locations;
+    var originalCfiFromPercentage = locations.cfiFromPercentage;
+    locations.cfiFromPercentage = function(percentage) {
+      return localStorage.getItem(key) || originalCfiFromPercentage.call(this, percentage);
+    };
+    function restore(currentCfi) {
+      restored = true;
+      if (currentCfi !== saved) rendition.display(saved);
+    }
+    rendition.on('relocated', function(location) {
+      if (!restored) return restore(location.start.cfi);
+      localStorage.setItem(key, location.start.cfi);
+    });
+    // First render may already be done before we got here.
+    if (!restored && rendition.location && rendition.location.start) restore(rendition.location.start.cfi);
+  }
+
   var waitForReader = setInterval(function(){
     if (!window.reader || !window.reader.rendition || typeof window.selectTheme !== 'function') return;
+    if (!window.epub || !window.epub.locations || !window.calibre) return;
     clearInterval(waitForReader);
+    restorePosition();
     var originalSelectTheme = window.selectTheme;
     window.selectTheme = function(id) {
       originalSelectTheme(id);

@@ -39,6 +39,11 @@ with warm grey text and the page arrows and title bar invisible (still
 clickable) to avoid OLED burn-in. Switching to another theme in the reader
 settings restores that theme's normal text colour.
 
+Your exact reading position is saved per book on every page turn (in the
+TV app's own storage) and restored when you reopen the book, even after the
+app was closed abruptly. CWA's own web reader only saves on page unload and
+keeps a rounded percentage that can reset to 0%.
+
 All of this is a small background daemon (`readerfix.py`, started at launch
 via the Homebrew Channel root exec bridge) that injects into the app's page
 over the on-device Chrome DevTools Protocol. It exits when the app closes.

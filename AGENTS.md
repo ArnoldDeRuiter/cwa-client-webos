@@ -23,6 +23,12 @@ bridge from `index.html`:
   = `blackTheme` (text overridden to the selected warm grey via
   `rendition.themes.override`, black theme only) and `calibre.reader.fontSize` = `200` (read by CWA's reader
   at startup) and sets `.arrow` / `#titlebar` to `opacity: 0` (OLED burn-in).
+  Position: saves `rendition` `relocated` CFI to `localStorage`
+  `cwa.tv.cfi.<bookUrl>` per page turn, restores it on first render, and
+  patches `epub.locations.cfiFromPercentage` so CWA's `epub-progress.js`
+  percent-jump lands on that CFI instead (its rounded % can be saved as 0
+  before locations generate; epubjs-reader's `previousLocationCfi` only
+  saves on unload, which an app close skips).
 - `loginfill.py` — fills `form.cwa-login-form` `username`/`password` from
   the `"cwa"` key in `/var/lib/webosbrew/tv-credentials.json`, never submits.
   Skips when the Flask-Login `remember_token` cookie exists.
