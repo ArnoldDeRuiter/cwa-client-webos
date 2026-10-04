@@ -14,6 +14,9 @@ bridge from `index.html`:
 - `readerfix.py` — CDP-injected keydown handler: ArrowLeft/ArrowRight
   dispatch pointer/mouse/click events at 50px from the left/right edge,
   mid-height, descending into same-origin iframes (epub reader).
+  On `/read/*` pages it also presets `localStorage` `calibre.reader.theme`
+  = `blackTheme` and `calibre.reader.fontSize` = `200` (read by CWA's reader
+  at startup) and sets `.arrow` / `#titlebar` to `opacity: 0` (OLED burn-in).
 - `loginfill.py` — fills `form.cwa-login-form` `username`/`password` from
   the `"cwa"` key in `/var/lib/webosbrew/tv-credentials.json`, never submits.
   Skips when the Flask-Login `remember_token` cookie exists.
